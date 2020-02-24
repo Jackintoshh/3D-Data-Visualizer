@@ -10,8 +10,8 @@ public class Graph : MonoBehaviour
     float spacing = 3.5f;
     List<Vector3> zpositions = new List<Vector3>();
     List<Vector3> xpositions = new List<Vector3>();
-    int unitConverter;
-    int axisSize = 72;
+    float unitConverter;
+    float axisSize;
 
     // Start is called before the first frame update
     void Start()
@@ -22,7 +22,7 @@ public class Graph : MonoBehaviour
         //Split data into separate lines + get all years needed to be plotted
         string[] lines = data.text.Split(new char[] { '\n' });
         string[] years = lines[0].Split(new char[] { ',' });
-        unitConverter = highRange / axisSize; // 72 is length of the axis in Unity units
+        //unitConverter = highRange / axisSize; // 72 is length of the axis in Unity units
         
         //Get all countries
         for (int i = 1; i < lines.Length; i++)
@@ -38,18 +38,27 @@ public class Graph : MonoBehaviour
     {
         GameObject graphPos = new GameObject();
         graphPos = this.gameObject;
-
+        
         //Set amount of labels on Y axis
         int intervals = 10;
 
-        //Get correct value to increment by
-        highRange = highRange / intervals;
-        int temp = 0;
+        
+
+        
+
         
         //Generate x,y,z axis
         GameObject yaxis = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         GameObject xaxis = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         GameObject zaxis = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+
+        axisSize = yaxis.GetComponent<Renderer>().bounds.size.y + (intervals * spacing) * 2;
+        unitConverter = highRange / axisSize;
+        Debug.Log(axisSize);
+
+        //Get correct value to increment by
+        highRange = highRange / intervals;
+        int temp = 0;
 
         yaxis.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
         xaxis.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
@@ -82,6 +91,13 @@ public class Graph : MonoBehaviour
             xaxis.transform.localScale += new Vector3(0, spacing, 0);
             zaxis.transform.localScale += new Vector3(0, spacing, 0);
         }
+
+
+        //float ybounds = yaxis.GetComponent<Renderer>().bounds.size.y;
+        float ybounds = yaxis.transform.localScale.y;
+        GameObject test = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        test.transform.position = new Vector3(0, ybounds, 0);
+        Debug.Log(ybounds);
 
         //Get size of x and z axis to correctly place labels later
         float xbounds = xaxis.GetComponent<Renderer>().bounds.max.y;
@@ -146,13 +162,17 @@ public class Graph : MonoBehaviour
                 //Create bar
                 GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cube.GetComponent<Renderer>().material.SetColor("_Color", cubecol);
+                cube.tag = "field";
+                
 
                 //Get value of field
                 int value = System.Convert.ToInt32(values[j]);
 
+                cube.name = countries[i - 1] + ',' + years[j - 1] + ',' + value;
+
                 //Scale bar based on value
                 cube.transform.position = cubeloc;
-                cube.transform.localScale += new Vector3(3, value / 1338, 3); //Divide value by 1338 to get value in Unity units
+                cube.transform.localScale += new Vector3(3, value / unitConverter, 3); //Divide value by 1338 to get value in Unity units
                 cube.transform.position += new Vector3(0, cube.transform.localScale.y/2, 0);
             }
         }

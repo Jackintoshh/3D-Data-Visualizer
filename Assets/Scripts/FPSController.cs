@@ -5,18 +5,34 @@ using System.Text;
 
 public class FPSController : MonoBehaviour
 {
-    public GameObject mainCamera;
+    public Camera mainCamera;
     public float speed = 50.0f;
-
+    //public Camera camera = Camera.main;
     public bool allowPitch = true;
+    public static RaycastHit hit;
+    Ray ray;
+    public GameObject canvas;
+    GUIContent content;
+
+    DrawFieldInfo dfi;
 
     // Use this for initialization
     void Start()
     {
-        if (mainCamera == null)
-        {
-            mainCamera = Camera.main.gameObject;
-        }
+        //if (mainCamera == null)
+        //{
+            mainCamera = Camera.main;
+        //}
+
+        //RaycastHit hit;
+        content = new GUIContent("This is a box", "This is a tooltip");
+        //canvas = new GameObject();
+        dfi = canvas.AddComponent<DrawFieldInfo>();
+    }
+
+    void OnGUI()
+    {
+        GUI.Box(new Rect(0, 0, Screen.width, Screen.height), content);
     }
 
     void Yaw(float angle)
@@ -69,6 +85,18 @@ public class FPSController : MonoBehaviour
         float speed = this.speed;
 
         float runAxis = 0; // Input.GetAxis("Run Axis");
+        ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out hit)&& hit.collider.tag == "field")
+        {
+            //Debug.Log("Did Hit");
+            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
+            
+            //Debug.Log(hit);
+            
+            dfi.drawInfo(hit);
+            
+        }
 
         if (Input.GetKey(KeyCode.Escape))
         {
