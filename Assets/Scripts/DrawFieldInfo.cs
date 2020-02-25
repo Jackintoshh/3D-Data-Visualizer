@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class DrawFieldInfo : MonoBehaviour
 {
     GameObject text;
+    string info;
     GameObject globalCanvas;
     public Font font;
 
@@ -17,13 +19,11 @@ public class DrawFieldInfo : MonoBehaviour
 
     public void drawInfo(RaycastHit hit)
     {
-      
-        //text.transform.SetParent(this.transform);
-        //text.name = "info";
-        
-        Text newText = GetComponent<Text>();
-        
-        newText.text = hit.transform.gameObject.name;
+        info = hit.transform.gameObject.name;
+        TextMeshProUGUI newText = GetComponent<TextMeshProUGUI>();
+        info = info.Replace(',', '\n');
+        Debug.Log(newText);
+        newText.text = info;
 
 
     }
