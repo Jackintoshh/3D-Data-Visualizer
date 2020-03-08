@@ -6,6 +6,7 @@ public class Graph : MonoBehaviour
 {
     TextAsset data;
     string[] countries = new string[6];
+    public static string[] years = new string[0];
     int highRange = 100000;
     float spacing = 3.5f;
     List<Vector3> zpositions = new List<Vector3>();
@@ -21,7 +22,7 @@ public class Graph : MonoBehaviour
         
         //Split data into separate lines + get all years needed to be plotted
         string[] lines = data.text.Split(new char[] { '\n' });
-        string[] years = lines[0].Split(new char[] { ',' });
+        years = lines[0].Split(new char[] { ',' });
         //unitConverter = highRange / axisSize; // 72 is length of the axis in Unity units
         
         //Get all countries
@@ -40,7 +41,7 @@ public class Graph : MonoBehaviour
         graphPos = this.gameObject;
         
         //Set amount of labels on Y axis
-        int intervals = 10;
+        int intervals = years.Length;
 
         
 

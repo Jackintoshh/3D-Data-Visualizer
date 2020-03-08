@@ -22,9 +22,9 @@ public class DrawFieldInfo : MonoBehaviour
         info = hit.transform.gameObject.name;
         TextMeshProUGUI newText = GetComponent<TextMeshProUGUI>();
         info = info.Replace(',', '\n');
-        Debug.Log(newText);
+        //Debug.Log(newText);
         newText.text = info;
-
+        //newText.transform.position = new Vector3(5, 5, 0);
 
     }
 }

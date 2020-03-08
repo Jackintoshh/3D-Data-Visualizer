@@ -12,7 +12,7 @@ public class FPSController : MonoBehaviour
     public static RaycastHit hit;
     Ray ray;
     public GameObject canvas;
-    GUIContent content;
+    
 
     DrawFieldInfo dfi;
 
@@ -25,15 +25,12 @@ public class FPSController : MonoBehaviour
         //}
 
         //RaycastHit hit;
-        content = new GUIContent("This is a box", "This is a tooltip");
+        
         //canvas = new GameObject();
         dfi = canvas.AddComponent<DrawFieldInfo>();
     }
 
-    void OnGUI()
-    {
-        GUI.Box(new Rect(0, 0, Screen.width, Screen.height), content);
-    }
+    
 
     void Yaw(float angle)
     {
