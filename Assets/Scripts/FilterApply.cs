@@ -10,8 +10,7 @@ public class FilterApply : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
+    void TaskOnClick()
     {
         
     }

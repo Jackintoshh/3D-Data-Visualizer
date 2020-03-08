@@ -10,7 +10,7 @@ public class Filters : MonoBehaviour
     public Button button;
     GameObject panel;
     TextMeshProUGUI text;
-    Graph graphob;
+    //Graph graphob;
     public GameObject filterToggle, applyButton;
     public GameObject togglepos, applypos;
     Toggle filToggle;
@@ -22,7 +22,7 @@ public class Filters : MonoBehaviour
         button = GetComponent<Button>();
         button.onClick.AddListener(TaskOnClick);
         panel = button.transform.parent.gameObject;
-        graphob = panel.AddComponent<Graph>();
+        //graphob = panel.AddComponent<Graph>();
     }
 
     void TaskOnClick()

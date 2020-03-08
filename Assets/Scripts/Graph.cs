@@ -13,6 +13,7 @@ public class Graph : MonoBehaviour
     List<Vector3> xpositions = new List<Vector3>();
     float unitConverter;
     float axisSize;
+    Dictionary<string, string> dict = new Dictionary<string, string>();
 
     // Start is called before the first frame update
     void Start()
@@ -32,6 +33,17 @@ public class Graph : MonoBehaviour
             countries[i-1] = split[0];
         }
 
+        
+
+        for (int i = 1; i < countries.Length; i++)
+        {
+            string[] values = lines[i].Split(new char[] { ',' });
+            for (int j = 1; j < years.Length; j++)
+            {
+                dict.Add(countries[i - 1] + ',' + years[j - 1], values[j]);
+            }
+        }
+
         generateBarChart(countries, years, lines);
     }
 
@@ -43,11 +55,23 @@ public class Graph : MonoBehaviour
         //Set amount of labels on Y axis
         int intervals = years.Length;
 
-        
+        for(int i = 0; i < countries.Length; i++)
+        {
+            for (int j = 0; j < years.Length; j++)
+            {
+                Debug.Log(countries[i] + years[j]);
+            }
+        }
+       
 
-        
+        /*foreach (KeyValuePair<string, string> item in dict)
+        {
+            Debug.Log("Key: {0}, Value: {1}" + item.Key + item.Value);
+        }
+        */
 
-        
+
+
         //Generate x,y,z axis
         GameObject yaxis = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         GameObject xaxis = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -149,34 +173,44 @@ public class Graph : MonoBehaviour
         for (int i = 1; i < countries.Length; i++)
         {
             //Get each value to be plotted
-            string[] values = lines[i].Split(new char[] { ',' });
-
-            //Get random colour for each country
-            Color cubecol = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
-
-            //Plot values for each country according to year
-            for (int j = 1; j < years.Length; j++)
-            {
-                //Get x and z positions to plot on graph
-                Vector3 cubeloc = new Vector3(xpositions[i-1].x, 0, zpositions[j-1].z);
-
-                //Create bar
-                GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                cube.GetComponent<Renderer>().material.SetColor("_Color", cubecol);
-                cube.tag = "field";
+            //string[] values = lines[i].Split(new char[] { ',' });
+            
                 
+                //Get random colour for each country
+                Color cubecol = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
 
-                //Get value of field
-                int value = System.Convert.ToInt32(values[j]);
+                //Plot values for each country according to year
+                for (int j = 1; j < years.Length; j++)
+                {
+                    //Get x and z positions to plot on graph
+                    Vector3 cubeloc = new Vector3(xpositions[i - 1].x, 0, zpositions[j - 1].z);
+                string key = countries[i-1] + ',' + years[j-1];
 
-                cube.name = countries[i - 1] + ',' + years[j - 1] + ',' + value;
+                foreach (KeyValuePair<string, string> item in dict)
+                {
+                    if(key == item.Key)
+                    {
+                        //Create bar
+                        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        cube.GetComponent<Renderer>().material.SetColor("_Color", cubecol);
+                        cube.tag = "field";
 
-                //Scale bar based on value
-                cube.transform.position = cubeloc;
-                cube.transform.localScale += new Vector3(3, value / unitConverter, 3); //Divide value by 1338 to get value in Unity units
-                cube.transform.position += new Vector3(0, cube.transform.localScale.y/2, 0);
+
+                        //Get value of field
+                        int value = System.Convert.ToInt32(item.Value);
+
+                        cube.name = countries[i - 1] + ',' + years[j - 1] + ',' + value;
+
+                        //Scale bar based on value
+                        cube.transform.position = cubeloc;
+                        cube.transform.localScale += new Vector3(3, value / unitConverter, 3); //Divide value by 1338 to get value in Unity units
+                        cube.transform.position += new Vector3(0, cube.transform.localScale.y / 2, 0);
+                    }
+                }
+                
+                }
             }
-        }
+        
 
         //Set axes in correct locations + rotations
         yaxis.transform.position += new Vector3(0, yaxis.transform.localScale.y, 0);
