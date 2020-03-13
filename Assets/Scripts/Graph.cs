@@ -5,22 +5,23 @@ using UnityEngine;
 public class Graph : MonoBehaviour
 {
     TextAsset data;
-    string[] countries = new string[6];
-    public static string[] years = new string[0];
-    int highRange = 100000;
+    public string[] countries = new string[6];
+    public string[] years = new string[0];
+    int highRange;
     float spacing = 3.5f;
     List<Vector3> zpositions = new List<Vector3>();
     List<Vector3> xpositions = new List<Vector3>();
     float unitConverter;
     float axisSize;
     Dictionary<string, string> dict = new Dictionary<string, string>();
-
+    public GameObject graphPos;
     // Start is called before the first frame update
     void Start()
     {
         //Load CSV File
         data = Resources.Load<TextAsset>("testdata");
-        
+
+        graphPos = new GameObject();
         //Split data into separate lines + get all years needed to be plotted
         string[] lines = data.text.Split(new char[] { '\n' });
         years = lines[0].Split(new char[] { ',' });
@@ -44,16 +45,24 @@ public class Graph : MonoBehaviour
             }
         }
 
-        generateBarChart(countries, years, lines);
+        generateBarChart(countries, years);
     }
 
-    void generateBarChart(string[] countries, string[] years, string[] lines)
+    public void generateBarChart(string[] countries, string[] years)
     {
-        GameObject graphPos = new GameObject();
         graphPos = this.gameObject;
+        highRange = 100000;
+        xpositions.Clear();
+        zpositions.Clear();
+
+        foreach (Transform child in graphPos.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        
         
         //Set amount of labels on Y axis
-        int intervals = years.Length;
+        int intervals = 10;
 
         for(int i = 0; i < countries.Length; i++)
         {
@@ -76,6 +85,10 @@ public class Graph : MonoBehaviour
         GameObject yaxis = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         GameObject xaxis = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         GameObject zaxis = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+
+        yaxis.transform.SetParent(graphPos.transform);
+        xaxis.transform.SetParent(graphPos.transform);
+        zaxis.transform.SetParent(graphPos.transform);
 
         axisSize = yaxis.GetComponent<Renderer>().bounds.size.y + (intervals * spacing) * 2;
         unitConverter = highRange / axisSize;
@@ -101,6 +114,7 @@ public class Graph : MonoBehaviour
 
             //Set text content and size of text
             GameObject ytext = new GameObject();
+            ytext.transform.SetParent(graphPos.transform);
             ytext.AddComponent<TextMesh>().text = temp.ToString();
             ytext.GetComponent<TextMesh>().characterSize = 2.5f;
 
@@ -110,7 +124,7 @@ public class Graph : MonoBehaviour
             ytext.GetComponent<TextMesh>().transform.position = textloc;
 
             //Spaces labels based on conversion from Numbers to Unity units
-            textloc += new Vector3(0, (int)highRange/unitConverter, 0); 
+            textloc += new Vector3(0, (int)highRange/unitConverter, 0);
 
             //Set size of other axes 
             xaxis.transform.localScale += new Vector3(0, spacing, 0);
@@ -139,6 +153,7 @@ public class Graph : MonoBehaviour
         {
             //Get correct text for labels
             GameObject xtext = new GameObject();
+            xtext.transform.SetParent(graphPos.transform);
             xtext.AddComponent<TextMesh>().text = countries[i];
             xtext.GetComponent<TextMesh>().characterSize = 2.0f;
             xtext.GetComponent<TextMesh>().anchor = TextAnchor.MiddleLeft;
@@ -149,6 +164,7 @@ public class Graph : MonoBehaviour
             //Set text location on axis, remember that coordinate to use for later
             xtext.transform.position = new Vector3(temp, 0, 0);
             xpositions.Add(xtext.transform.position);
+            
         }
 
         temp = 0;
@@ -158,6 +174,7 @@ public class Graph : MonoBehaviour
         {
             //Get correct text for labels
             GameObject ztext = new GameObject();
+            ztext.transform.SetParent(graphPos.transform);
             ztext.AddComponent<TextMesh>().text = years[i];
             ztext.GetComponent<TextMesh>().characterSize = 2.5f;
 
@@ -167,6 +184,7 @@ public class Graph : MonoBehaviour
             //Set position of label, remember this coordinate for later
             ztext.transform.position = new Vector3(0, 0, temp);
             zpositions.Add(ztext.transform.position);
+            
         }
 
         //Plot bars on the chart
@@ -192,6 +210,7 @@ public class Graph : MonoBehaviour
                     {
                         //Create bar
                         GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        cube.transform.SetParent(graphPos.transform);
                         cube.GetComponent<Renderer>().material.SetColor("_Color", cubecol);
                         cube.tag = "field";
 
@@ -211,7 +230,7 @@ public class Graph : MonoBehaviour
                 }
             }
         
-
+        //graphPos.transform.child
         //Set axes in correct locations + rotations
         yaxis.transform.position += new Vector3(0, yaxis.transform.localScale.y, 0);
         xaxis.transform.Rotate(0, 0, 90f);
