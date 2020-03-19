@@ -18,12 +18,12 @@ public class FilterApply : MonoBehaviour
     {
         apply = this.gameObject;
         button = GetComponent<Button>();
-        button.onClick.AddListener(TaskOnClick2);
+        button.onClick.AddListener(TaskOnClick);
         initGraph = GameObject.FindGameObjectWithTag("environment");
         graph = initGraph.GetComponent<Graph>();
     }
 
-    void TaskOnClick2()
+    void TaskOnClick()
     {
         j = 0;
         for(int i = 0; i < Filters.axis1toggles.Count; i++)
