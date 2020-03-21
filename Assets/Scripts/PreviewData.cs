@@ -3,25 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Text.RegularExpressions;
+//imports Microsoft.VisualBasic.FileIO;
 
 public class PreviewData : MonoBehaviour
 {
     TextAsset data;
     int previewLength;
     GameObject panel;
+    public GameObject firstCell;
     TextMeshProUGUI text;
-    int i, j = 0;
+    int CellSize;
+    
     void Start()
     {
         previewLength = 5;
-        data = Resources.Load<TextAsset>("testdata2");
+        CellSize = 200;
+        data = Resources.Load<TextAsset>("testdata3");
+        string data2 = data.ToString();
+        Debug.Log(data2);
         panel = this.gameObject;
-
+        Debug.Log("Hello");
         string[] lines = data.text.Split(new char[] { '\n' });
-        
-        
-       // text = panel.GetComponentInChildren<TextMeshProUGUI>();
-        
+        //string [] lines2 = Regex.Split(lines.ToString(), ",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
+
+        //foreach (string line in lines2)
+          //  {
+           // Debug.Log(line);
+        //}
+        //Using parser As New Microsoft.VisualBasic.FileIO.TextFieldParser(_New System.IO.StringReader(testData));
+        // text = panel.GetComponentInChildren<TextMeshProUGUI>();
+
         //textOb.transform.position = panel.transform.position;
 
         /*for (int i = 0; i < previewLength; i++)
@@ -52,8 +64,11 @@ public class PreviewData : MonoBehaviour
 
         for (int i = 0; i < previewLength; i++)
         {
-            string[] cells = lines[i].Split(new char[] { ',' });
+            string[] cells = Regex.Split(lines[i], ",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
+
+            
             GameObject textOb = new GameObject();
+            
             textOb.transform.SetParent(panel.transform);
             TextMeshProUGUI text = textOb.AddComponent<TextMeshProUGUI>();
             HorizontalLayoutGroup hlg = textOb.AddComponent<HorizontalLayoutGroup>();
@@ -63,12 +78,17 @@ public class PreviewData : MonoBehaviour
             hlg.childControlWidth = false;
             hlg.childForceExpandHeight = false;
             hlg.childForceExpandWidth = false;
-            hlg.padding.left = 55;
-            textOb.GetComponent<RectTransform>().sizeDelta = new Vector2(55, 50);
+            hlg.padding.left = CellSize;
+            textOb.GetComponent<RectTransform>().sizeDelta = new Vector2(CellSize, 50);
             text.text = cells[0];
-            text.fontSize = 12;
+            text.fontSize = 24;
+            text.color = Color.black;
 
-            
+            if (i == 0)
+            {
+                firstCell = textOb;
+            }
+
             for (int j = 1; j < cells.Length; j++)
             {
                 GameObject hortextOb = new GameObject();
@@ -79,9 +99,10 @@ public class PreviewData : MonoBehaviour
                 {
                     hortextOb.GetComponent<RectTransform>().transform.position += new Vector3(20, 0, 0);
                 }*/
-                hortextOb.GetComponent<RectTransform>().sizeDelta = new Vector2(55, 50);
+                hortextOb.GetComponent<RectTransform>().sizeDelta = new Vector2(CellSize, 50);
                 hortext.text = cells[j];
-                hortext.fontSize = 12;
+                hortext.color = Color.black;
+                hortext.fontSize = 24;
             }
 
         }
