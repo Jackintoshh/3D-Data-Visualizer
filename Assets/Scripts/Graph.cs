@@ -15,11 +15,19 @@ public class Graph : MonoBehaviour
     float axisSize;
     Dictionary<string, string> dict = new Dictionary<string, string>();
     public GameObject graphPos;
+    Camera camera;
+    public Vector3 camPos;
+    public float mouseRotateSpeed = 5f;
+
     // Start is called before the first frame update
     void Start()
     {
         //Load CSV File
         data = Resources.Load<TextAsset>("testdata");
+
+        camera = Camera.main;
+        camPos = new Vector3(-10f, 36f, -75f);
+        camera.transform.position = camPos;
 
         graphPos = new GameObject();
         //Split data into separate lines + get all years needed to be plotted
@@ -47,6 +55,8 @@ public class Graph : MonoBehaviour
 
         generateBarChart(countries, years);
     }
+
+    
 
     public void generateBarChart(string[] countries, string[] years)
     {
@@ -93,6 +103,8 @@ public class Graph : MonoBehaviour
         axisSize = yaxis.GetComponent<Renderer>().bounds.size.y + (intervals * spacing) * 2;
         unitConverter = highRange / axisSize;
         Debug.Log(axisSize);
+        camPos = new Vector3(camPos.x, axisSize/2, camPos.z);
+        camera.transform.position = camPos;
 
         //Get correct value to increment by
         highRange = highRange / intervals;

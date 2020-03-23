@@ -2,18 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using TMPro;
 
 public class FPSController : MonoBehaviour
 {
     public Camera mainCamera;
     public float speed = 50.0f;
     //public Camera camera = Camera.main;
-    public bool allowPitch = true;
+    public bool allowPitch = false;
     public static RaycastHit hit;
     Ray ray;
     public GameObject canvas;
-    
-
+    public float mouseRotateSpeed = 15f;
+    public GameObject camText;
+    [SerializeField]
+    public bool camMode;
+    Graph graph;
+    RotateGraph rg;
+    public GameObject graphob;
+    LayerMask mask;
     DrawFieldInfo dfi;
 
     // Use this for initialization
@@ -25,9 +32,11 @@ public class FPSController : MonoBehaviour
         //}
 
         //RaycastHit hit;
-        
+        mask = LayerMask.GetMask("spin");
         //canvas = new GameObject();
         dfi = canvas.AddComponent<DrawFieldInfo>();
+        camMode = true;
+        graph = graphob.GetComponent<Graph>();
     }
 
     
@@ -84,9 +93,12 @@ public class FPSController : MonoBehaviour
         float runAxis = 0; // Input.GetAxis("Run Axis");
         ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, out hit)&& hit.collider.tag == "field")
+        int layerMask = 1 << 8;
+        layerMask = ~layerMask;
+
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask)&& hit.collider.tag == "field")
         {
-            //Debug.Log("Did Hit");
+            Debug.Log("Did Hit");
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
             
             //Debug.Log(hit);
@@ -113,25 +125,49 @@ public class FPSController : MonoBehaviour
         {
             Fly(-Time.deltaTime * speed);
         }
-
+        
+        if (Input.GetKeyDown("h"))
+        {
+            if(camMode)
+            {
+                camMode = false;
+                camText.GetComponent<TextMeshProUGUI>().text = "Free Cam";
+            }
+            else if(!camMode)
+            {
+                camMode = true;
+                camText.GetComponent<TextMeshProUGUI>().text = "Fixed Cam";
+            }
+            
+        }
+        
         Vector3 a = new Vector3();
         a.x = 10;
 
-
-
-        mouseX = Input.GetAxis("Mouse X");
-        mouseY = Input.GetAxis("Mouse Y");
-
-
-        Yaw(mouseX * speed * Time.deltaTime);
-        if (allowPitch)
+        if (camMode)
         {
-            Pitch(-mouseY * speed * Time.deltaTime);
+            mainCamera.transform.position = graph.camPos;
         }
+        else
+        {
 
-        float contWalk = Input.GetAxis("Vertical");
-        float contStrafe = Input.GetAxis("Horizontal");
-        Walk(contWalk * speed * Time.deltaTime);
-        Strafe(contStrafe * speed * Time.deltaTime);
+
+            mouseX = Input.GetAxis("Mouse X");
+            mouseY = Input.GetAxis("Mouse Y");
+
+
+            //Yaw(mouseX * speed * Time.deltaTime);
+            if (allowPitch)
+            {
+                //Pitch(-mouseY * speed * Time.deltaTime);
+            }
+
+            float contWalk = Input.GetAxis("Vertical");
+            float contStrafe = Input.GetAxis("Horizontal");
+            Walk(contWalk * speed * Time.deltaTime);
+            Strafe(contStrafe * speed * Time.deltaTime);
+       }
     }
+
+    
 }
