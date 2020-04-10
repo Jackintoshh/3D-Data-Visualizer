@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Text.RegularExpressions;
-//imports Microsoft.VisualBasic.FileIO;
+using SimpleFileBrowser;
 
 public class PreviewData : MonoBehaviour
 {
@@ -14,6 +14,9 @@ public class PreviewData : MonoBehaviour
     public GameObject firstCell;
     TextMeshProUGUI text;
     int CellSize;
+    public GameObject filebutton;
+    public GameObject gobutton;
+    Button Filebutton;
     
     void Start()
     {
@@ -25,42 +28,8 @@ public class PreviewData : MonoBehaviour
         panel = this.gameObject;
         Debug.Log("Hello");
         string[] lines = data.text.Split(new char[] { '\n' });
-        //string [] lines2 = Regex.Split(lines.ToString(), ",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
-
-        //foreach (string line in lines2)
-          //  {
-           // Debug.Log(line);
-        //}
-        //Using parser As New Microsoft.VisualBasic.FileIO.TextFieldParser(_New System.IO.StringReader(testData));
-        // text = panel.GetComponentInChildren<TextMeshProUGUI>();
-
-        //textOb.transform.position = panel.transform.position;
-
-        /*for (int i = 0; i < previewLength; i++)
-        {
-            //text.text += lines[i] + '\n';
-            string[] cells = lines[i].Split(new char[] { ',' });
-            
-
-            for (int j = 0; j < cells.Length; j++)
-            {
-                GameObject textOb = new GameObject();
-                textOb.transform.SetParent(panel.transform);
-                TextMeshProUGUI text = textOb.AddComponent<TextMeshProUGUI>();
-                textOb.GetComponent<RectTransform>().sizeDelta = new Vector2(55, 50);
-                text.text = cells[j];
-                textOb.name = cells[j];
-                text.fontSize = 12;
-
-                if(j == cells.Length - 1)
-                {
-                    textOb.transform.position += new Vector3(0, 20, 0);
-                    Debug.Log("Heya");
-                }
-            }
-            
-        }
-        */
+        Filebutton = filebutton.GetComponent<Button>();
+        Filebutton.onClick.AddListener(TaskOnClick);
 
         for (int i = 0; i < previewLength; i++)
         {
@@ -109,9 +78,13 @@ public class PreviewData : MonoBehaviour
 
     }
 
-    // Update is called once per frame
-    void Update()
+
+    void TaskOnClick()
     {
-        
+        FileBrowser.SetDefaultFilter(".csv");
+
+        FileBrowser.ShowLoadDialog((path) => { Debug.Log("Selected: " + path); },
+                                        () => { Debug.Log( "Canceled" ); }, 
+                                        false, null, "Select Folder", "Select" );
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RotateGraph : MonoBehaviour
 {
-    float mouseRotateSpeed = 5f;
+    float RotateSpeed = 5f;
     Camera camera; 
 
     private void Start()
@@ -13,7 +13,7 @@ public class RotateGraph : MonoBehaviour
     }
     void OnMouseDrag()
     {
-        transform.rotation = Quaternion.AngleAxis(-Input.GetAxis("Mouse X") * mouseRotateSpeed, camera.transform.up) * transform.rotation;
+        transform.rotation = Quaternion.AngleAxis(-Input.GetAxis("Mouse X") * RotateSpeed, camera.transform.up) * transform.rotation;
         //Quaternion.AngleAxis(Input.GetAxis("Mouse Y") * mouseRotateSpeed, camera.transform.right) *
         //transform.rotation;
     }

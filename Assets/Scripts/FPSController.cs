@@ -91,6 +91,8 @@ public class FPSController : MonoBehaviour
         float speed = this.speed;
 
         float runAxis = 0; // Input.GetAxis("Run Axis");
+
+
         ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
         int layerMask = 1 << 8;
@@ -98,13 +100,7 @@ public class FPSController : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask)&& hit.collider.tag == "field")
         {
-            Debug.Log("Did Hit");
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
-            
-            //Debug.Log(hit);
-            
             dfi.drawInfo(hit);
-            
         }
 
         if (Input.GetKey(KeyCode.Escape))
