@@ -2608,6 +2608,10 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: Scatter Plot
       m_Image: {fileID: 0}
+    - m_Text: Connected Dots
+      m_Image: {fileID: 0}
+    - m_Text: Series Plot
+      m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
