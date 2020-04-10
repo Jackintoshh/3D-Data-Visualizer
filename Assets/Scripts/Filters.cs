@@ -42,7 +42,6 @@ public class Filters : MonoBehaviour
                 axis1toggles.Add(Instantiate(filterToggle, button.transform.position, Quaternion.identity, panel.transform));
                 axis1toggles[i].transform.SetParent(content.transform);
                 Text toggletext = axis1toggles[i].GetComponentInChildren<Text>();
-
                 axis1toggles[i].name = graph.axis1toggles[i];
                 toggletext.text = graph.axis1toggles[i];
                 
@@ -56,7 +55,6 @@ public class Filters : MonoBehaviour
                     axis2toggles.Add(Instantiate(filterToggle, togglepos.transform.position, Quaternion.identity, panel.transform));
                     axis2toggles[i].transform.SetParent(content.transform);
                     Text toggletext = axis2toggles[i].GetComponentInChildren<Text>();
-
                     axis2toggles[i].name = graph.axis2toggles[i];
                     toggletext.text = graph.axis2toggles[i];
                     

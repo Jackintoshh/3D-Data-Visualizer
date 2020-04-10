@@ -48,20 +48,15 @@ public class FilterApply : MonoBehaviour
                 j++;
             }
         }
-        axis1arr = axis1.ToArray();
-        axis2arr = axis2.ToArray();
 
-        for(int i = 0; i < axis1arr.Length; i++)
+        if (PreviewData.dropdown.value == 0)
         {
-            Debug.Log(axis1arr[i]);
+            graph.generateBarChart(axis1, axis2);
         }
 
-        for (int i = 0; i < axis2arr.Length; i++)
+        if (PreviewData.dropdown.value == 1)
         {
-            Debug.Log(axis2arr[i]);
+            graph.generateScatterPlot(axis1, axis2);
         }
-        graph.axis1 = axis1arr;
-        graph.axis2 = axis2arr;
-        graph.generateBarChart(axis1arr, axis2arr);
     }
 }

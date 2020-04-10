@@ -14,7 +14,5 @@ public class RotateGraph : MonoBehaviour
     void OnMouseDrag()
     {
         transform.rotation = Quaternion.AngleAxis(-Input.GetAxis("Mouse X") * RotateSpeed, camera.transform.up) * transform.rotation;
-        //Quaternion.AngleAxis(Input.GetAxis("Mouse Y") * mouseRotateSpeed, camera.transform.right) *
-        //transform.rotation;
     }
 }

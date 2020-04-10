@@ -1,21 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Text.RegularExpressions;
 
 public class Graph : MonoBehaviour
 {
-    TextAsset data;
+    //TextAsset data;
+    string data;
 
-    public string[] axis1 = new string[0];
-    public string[] axis2 = new string[0];
-    //public List<string> axis1 = new List<string>();
-    //public List<string> axis1 = new List<string>();
+    //public string[] axis1 = new string[0];
+    //public string[] axis2 = new string[0];
+    public List<string> axis1 = new List<string>();
+    public List<string> axis2 = new List<string>();
     int highRange;
     float spacing = 3.5f;
     List<Vector3> zpositions = new List<Vector3>();
     List<Vector3> xpositions = new List<Vector3>();
     public List<string> axis1toggles = new List<string>();
     public List<string> axis2toggles = new List<string>();
+    string path;
     
     float unitConverter;
     float axisSize;
@@ -37,8 +40,10 @@ public class Graph : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        path = PreviewData.path1;
+
         //Load CSV File
-        data = Resources.Load<TextAsset>("testdata");
+        data = System.IO.File.ReadAllText(path);//Resources.Load<TextAsset>("testdata");
 
         camera = Camera.main;
         camPos = new Vector3(-10f, 36f, -75f);
@@ -47,37 +52,49 @@ public class Graph : MonoBehaviour
         graphPos = new GameObject();
 
         //Split data into separate lines
-        string[] lines = data.text.Split(new char[] { '\n' });
-        axis2 = lines[0].Split(new char[] { ',' });
-        
-        string[] temp = new string[6];
+        string[] lines = data.Split(new char[] { '\n' });
+        Debug.Log(lines[0]);
+        string[] temp = Regex.Split(lines[0], ",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
+        for (int i = 1; i < temp.Length; i++)
+        {
+            
+        axis2.Add(temp[i]);//lines[0].Split(new char[] { ',' });
+        }
+
+        for (int i = 0; i < axis2.Count; i++)
+        {
+            Debug.Log(axis2[i]);
+        }
+        string[] temp2 = new string[6];
 
         //Get labels for XAxis
         for (int i = 1; i < lines.Length; i++)
         {
             string[] split = lines[i].Split(new char[] { ',' });
-            temp[i - 1] = split[0];
+            axis1.Add(split[0]);
         }
-        axis1 = temp;
+        //axis1 = temp;
 
-        for (int i = 0; i < axis1.Length; i++)
+        for (int i = 0; i < axis1.Count; i++)
         {
             axis2toggles.Add(axis1[i]);
         }
 
-        for (int i = 0; i < axis2.Length; i++)
+        for (int i = 0; i < axis2.Count; i++)
         {
             axis1toggles.Add(axis2[i]);
         }
 
         int k = 0;
         
-        for (int i = 1; i < axis1.Length; i++)
+        for (int i = 1; i < axis1.Count; i++)
         {
             k = 1;
             string[] values = lines[i].Split(new char[] { ',' });
-            for (int j = 0; j < axis2.Length; j++)
+            for (int j = 0; j < axis2.Count; j++)
             {
+                Debug.Log(axis2[j]);
+                Debug.Log(values[k]);
                 dict.Add(axis1[i - 1] + ',' + axis2[j], values[k]);
                 k++;
             }
@@ -87,11 +104,20 @@ public class Graph : MonoBehaviour
         {
             Debug.Log(item);
         }
-        generateBarChart(axis1, axis2);
-        //generateScatterPlot(countries, years);
+
+        if(PreviewData.dropdown.value == 0)
+        {
+            generateBarChart(axis1, axis2);
+        }
+
+        if (PreviewData.dropdown.value == 1)
+        {
+            generateScatterPlot(axis1, axis2);
+        }
+        
     }
 
-    public void generateScatterPlot(string[] axis1, string[] axis2)
+    public void generateScatterPlot(List<string> axis1, List<string> axis2)
     {
         graphPos = this.gameObject;
         highRange = 100000;
@@ -103,29 +129,26 @@ public class Graph : MonoBehaviour
 
         //float ybounds = yaxis.GetComponent<Renderer>().bounds.size.y;
         ybounds = yaxis.transform.localScale.y;
-        GameObject test = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        test.transform.position = new Vector3(0, ybounds, 0);
-        Debug.Log(ybounds);
 
         //Get size of x and z axis to correctly place labels later
         xbounds = xaxis.GetComponent<Renderer>().bounds.max.y;
         zbounds = zaxis.GetComponent<Renderer>().bounds.max.y;
 
         //Divide axis length by amount of labels to get even distribution
-        xbounds = xbounds / axis1.Length;
-        zbounds = zbounds / axis2.Length;
+        xbounds = xbounds / axis1.Count;
+        zbounds = zbounds / axis2.Count;
 
         setupXAxis(axis1, axis2);
         setupZAxis(axis1, axis2);
 
         //Plot bars on the chart
-        for (int i = 1; i < axis1.Length; i++)
+        for (int i = 1; i < axis1.Count; i++)
         {
             //Get random colour for each country
             Color cubecol = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
 
             //Plot values for each country according to year
-            for (int j = 1; j < axis2.Length; j++)
+            for (int j = 1; j < axis2.Count; j++)
             {
                 //Get x and z positions to plot on graph
                 Vector3 sphereloc = new Vector3(xpositions[i - 1].x, 0, zpositions[j - 1].z);
@@ -163,7 +186,7 @@ public class Graph : MonoBehaviour
     }
 
     
-    void setupAxes(string[] axis1, string[] axis2)
+    void setupAxes(List<string> axis1, List<string> axis2)
     {
         foreach (Transform child in graphPos.transform)
         {
@@ -196,12 +219,10 @@ public class Graph : MonoBehaviour
         xaxis.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
         zaxis.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
 
-        yaxis.transform.position = graphPos.transform.position;
-
-        textloc = Vector3.zero;
+        textloc = new Vector3(graphPos.transform.position.x - 10, graphPos.transform.position.y + 2, graphPos.transform.position.z);
     }
 
-    void setupYAxis(string[] axis1, string[] axis2)
+    void setupYAxis(List<string> axis1, List<string> axis2)
     {
         for (int i = 0; i < intervals; i++)
         {
@@ -228,12 +249,12 @@ public class Graph : MonoBehaviour
         }
     }
 
-    void setupXAxis(string[] axis1, string[] axis2)
+    void setupXAxis(List<string> axis1, List<string> axis2)
     {
         temp = 0;
 
         //Set up X-Axis
-        for (int i = 0; i < axis1.Length; i++)
+        for (int i = 0; i < axis1.Count; i++)
         {
             //Get correct text for labels
             GameObject xtext = new GameObject();
@@ -252,12 +273,12 @@ public class Graph : MonoBehaviour
         }
     }
 
-    void setupZAxis(string[] axis1, string[] axis2)
+    void setupZAxis(List<string> axis1, List<string> axis2)
     {
         temp = 0;
 
         //Set up Z-Axis
-        for (int i = 0; i < axis2.Length; i++)
+        for (int i = 0; i < axis2.Count; i++)
         {
             //Get correct text for labels
             GameObject ztext = new GameObject();
@@ -286,7 +307,7 @@ public class Graph : MonoBehaviour
 
     
 
-    public void generateBarChart(string[] axis1, string[] axis2)
+    public void generateBarChart(List<string> axis1, List<string> axis2)
     {
         graphPos = this.gameObject;
         highRange = 100000;
@@ -296,37 +317,35 @@ public class Graph : MonoBehaviour
         setupAxes(axis1, axis2);
         setupYAxis(axis1, axis2);
 
-        //float ybounds = yaxis.GetComponent<Renderer>().bounds.size.y;
+        
         ybounds = yaxis.transform.localScale.y;
-        GameObject test = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        test.transform.position = new Vector3(0, ybounds, 0);
-        Debug.Log(ybounds);
+        
 
         //Get size of x and z axis to correctly place labels later
         xbounds = xaxis.GetComponent<Renderer>().bounds.max.y;
         zbounds = zaxis.GetComponent<Renderer>().bounds.max.y;
         
         //Divide axis length by amount of labels to get even distribution
-        xbounds = xbounds / axis1.Length;
-        zbounds = zbounds / axis2.Length;
+        xbounds = xbounds / axis1.Count;
+        zbounds = zbounds / axis2.Count;
 
         setupXAxis(axis1, axis2);
         setupZAxis(axis1, axis2);
 
 
         //Plot bars on the chart
-        for (int i = 1; i < axis1.Length; i++)
+        for (int i = 1; i < axis1.Count; i++)
         {
             //Get random colour for each country
             Color cubecol = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
 
             //Plot values for each country according to year
-            for (int j = 0; j < axis2.Length; j++)
+            for (int j = 0; j < axis2.Count; j++)
                 {
                     //Get x and z positions to plot on graph
                     Vector3 cubeloc = new Vector3(xpositions[i - 1].x, 0, zpositions[j].z);
                     string key = axis1[i-1] + ',' + axis2[j];
-                
+                    Debug.Log(key);
                     foreach (KeyValuePair<string, string> item in dict)
                     {
                         if(key == item.Key)
@@ -337,6 +356,7 @@ public class Graph : MonoBehaviour
                             cube.GetComponent<Renderer>().material.SetColor("_Color", cubecol);
                             cube.tag = "field";
 
+                        Debug.Log(item.Value + "here");
                             //Get value of field
                             int value = System.Convert.ToInt32(item.Value);
 
@@ -360,9 +380,4 @@ public class Graph : MonoBehaviour
 
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
