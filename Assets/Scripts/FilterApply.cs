@@ -58,5 +58,15 @@ public class FilterApply : MonoBehaviour
         {
             graph.generateScatterPlot(axis1, axis2);
         }
+
+        if (PreviewData.dropdown.value == 2)
+        {
+            graph.generateConnectedDots(axis1, axis2);
+        }
+
+        if (PreviewData.dropdown.value == 2)
+        {
+            graph.generateSeriesPlot(axis1, axis2);
+        }
     }
 }

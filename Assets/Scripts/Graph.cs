@@ -13,7 +13,7 @@ public class Graph : MonoBehaviour
     public List<string> axis1 = new List<string>();
     public List<string> axis2 = new List<string>();
     int highRange;
-    float spacing = 3.5f;
+    float spacing;
     List<Vector3> zpositions = new List<Vector3>();
     List<Vector3> xpositions = new List<Vector3>();
     public List<string> axis1toggles = new List<string>();
@@ -36,6 +36,7 @@ public class Graph : MonoBehaviour
     int temp;
     Vector3 textloc;
     float ybounds, xbounds, zbounds;
+    float textSize;
 
     // Start is called before the first frame update
     void Start()
@@ -108,21 +109,33 @@ public class Graph : MonoBehaviour
         if(PreviewData.dropdown.value == 0)
         {
             generateBarChart(axis1, axis2);
+            
         }
 
         if (PreviewData.dropdown.value == 1)
         {
             generateScatterPlot(axis1, axis2);
         }
-        
+
+        if (PreviewData.dropdown.value == 2)
+        {
+            generateConnectedDots(axis1, axis2);
+        }
+
+        if (PreviewData.dropdown.value == 3)
+        {
+            generateSeriesPlot(axis1, axis2);
+        }
     }
 
     public void generateScatterPlot(List<string> axis1, List<string> axis2)
     {
         graphPos = this.gameObject;
         highRange = 100000;
+        spacing = 3f;
         xpositions.Clear();
         zpositions.Clear();
+        textSize = 1.8f;
 
         setupAxes(axis1, axis2);
         setupYAxis(axis1, axis2);
@@ -148,11 +161,11 @@ public class Graph : MonoBehaviour
             Color cubecol = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
 
             //Plot values for each country according to year
-            for (int j = 1; j < axis2.Count; j++)
+            for (int j = 0; j < axis2.Count; j++)
             {
                 //Get x and z positions to plot on graph
-                Vector3 sphereloc = new Vector3(xpositions[i - 1].x, 0, zpositions[j - 1].z);
-                string key = axis1[i - 1] + ',' + axis2[j - 1];
+                Vector3 sphereloc = new Vector3(xpositions[i - 1].x, 0, zpositions[j].z);
+                string key = axis1[i - 1] + ',' + axis2[j];
 
                 foreach (KeyValuePair<string, string> item in dict)
                 {
@@ -168,7 +181,7 @@ public class Graph : MonoBehaviour
                         //Get value of field
                         int value = System.Convert.ToInt32(item.Value);
 
-                        sphere.name = axis1[i - 1] + ',' + axis2[j - 1] + ',' + value;
+                        sphere.name = axis1[i - 1] + ',' + axis2[j] + ',' + value;
 
                         //Scale bar based on value
                         sphere.transform.position = sphereloc;
@@ -260,7 +273,7 @@ public class Graph : MonoBehaviour
             GameObject xtext = new GameObject();
             xtext.transform.SetParent(graphPos.transform);
             xtext.AddComponent<TextMesh>().text = axis1[i];
-            xtext.GetComponent<TextMesh>().characterSize = 2.0f;
+            xtext.GetComponent<TextMesh>().characterSize = textSize;
             xtext.GetComponent<TextMesh>().anchor = TextAnchor.MiddleLeft;
 
             //Leave enough space for labels
@@ -284,7 +297,7 @@ public class Graph : MonoBehaviour
             GameObject ztext = new GameObject();
             ztext.transform.SetParent(graphPos.transform);
             ztext.AddComponent<TextMesh>().text = axis2[i];
-            ztext.GetComponent<TextMesh>().characterSize = 2.5f;
+            ztext.GetComponent<TextMesh>().characterSize = textSize;
 
             //Leave enough space for labels
             temp = temp + ((int)zbounds * 2);
@@ -313,7 +326,9 @@ public class Graph : MonoBehaviour
         highRange = 100000;
         xpositions.Clear();
         zpositions.Clear();
+        textSize = 2f;
 
+        spacing = 5f;
         setupAxes(axis1, axis2);
         setupYAxis(axis1, axis2);
 
@@ -356,7 +371,7 @@ public class Graph : MonoBehaviour
                             cube.GetComponent<Renderer>().material.SetColor("_Color", cubecol);
                             cube.tag = "field";
 
-                        Debug.Log(item.Value + "here");
+                            Debug.Log(item.Value + "here");
                             //Get value of field
                             int value = System.Convert.ToInt32(item.Value);
 
@@ -378,6 +393,163 @@ public class Graph : MonoBehaviour
 
         
 
+    }
+
+    public void generateConnectedDots(List<string> axis1, List<string> axis2)
+    {
+        graphPos = this.gameObject;
+        highRange = 100000;
+        spacing = 4f;
+        xpositions.Clear();
+        zpositions.Clear();
+        textSize = 2f;
+
+        setupAxes(axis1, axis2);
+        setupYAxis(axis1, axis2);
+
+        //float ybounds = yaxis.GetComponent<Renderer>().bounds.size.y;
+        ybounds = yaxis.transform.localScale.y;
+
+        //Get size of x and z axis to correctly place labels later
+        xbounds = xaxis.GetComponent<Renderer>().bounds.max.y;
+        zbounds = zaxis.GetComponent<Renderer>().bounds.max.y;
+
+        //Divide axis length by amount of labels to get even distribution
+        xbounds = xbounds / axis1.Count;
+        zbounds = zbounds / axis2.Count;
+
+        setupXAxis(axis1, axis2);
+        setupZAxis(axis1, axis2);
+
+        
+        //Plot bars on the chart
+        for (int i = 1; i < axis1.Count; i++)
+        {
+            //Get random colour for each country
+            Color cubecol = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
+            Vector3[] linepositions = new Vector3[axis2.Count];
+
+            //Plot values for each country according to year
+            for (int j = 0; j < axis2.Count; j++)
+            {
+                //Get x and z positions to plot on graph
+                Vector3 lineDotloc = new Vector3(xpositions[i - 1].x, 0, zpositions[j].z);
+                string key = axis1[i - 1] + ',' + axis2[j];
+                
+                //line.positionCount = axis2.Count;
+                foreach (KeyValuePair<string, string> item in dict)
+                {
+                    if (key == item.Key)
+                    {
+                        //Create bar
+                        GameObject lineDot = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                        lineDot.transform.SetParent(graphPos.transform);
+                        lineDot.GetComponent<Renderer>().material.SetColor("_Color", cubecol);
+                        lineDot.tag = "field";
+
+                        //LineRenderer line = lineDot.AddComponent<LineRenderer>();
+                        
+
+                        //Get value of field
+                        int value = System.Convert.ToInt32(item.Value);
+
+                        lineDot.name = axis1[i - 1] + ',' + axis2[j] + ',' + value;
+
+                        //Scale bar based on value
+                        lineDot.transform.position = lineDotloc;
+                        lineDot.transform.localScale += new Vector3(1f, 1f, 1f); //Divide value by 1338 to get value in Unity units
+                        lineDot.transform.position = new Vector3(lineDotloc.x, value / unitConverter, lineDotloc.z);
+                        linepositions[j] = new Vector3(lineDotloc.x, value / unitConverter, lineDotloc.z);
+                        //
+                    }
+                }
+                
+            }
+            GameObject lineOb = new GameObject();
+            lineOb.transform.SetParent(graphPos.transform);
+            LineRenderer line = lineOb.AddComponent<LineRenderer>();
+            line.positionCount = axis2.Count - 1;
+            line.GetComponent<Renderer>().material.SetColor("_Color", cubecol);
+            line.alignment = LineAlignment.View;
+            line.useWorldSpace = false;
+            line.SetPositions(linepositions);
+        }
+
+        //graphPos.transform.child
+        //Set axes in correct locations + rotations
+        setupAxisOrientation();
+    }
+
+    public void generateSeriesPlot(List<string> axis1, List<string> axis2)
+    {
+        graphPos = this.gameObject;
+        highRange = 100000;
+        xpositions.Clear();
+        zpositions.Clear();
+        textSize = 1.5f;
+
+        spacing = 2.5f;
+        setupAxes(axis1, axis2);
+        setupYAxis(axis1, axis2);
+
+
+        ybounds = yaxis.transform.localScale.y;
+
+
+        //Get size of x and z axis to correctly place labels later
+        xbounds = xaxis.GetComponent<Renderer>().bounds.max.y;
+        zbounds = zaxis.GetComponent<Renderer>().bounds.max.y;
+
+        //Divide axis length by amount of labels to get even distribution
+        xbounds = xbounds / axis1.Count;
+        zbounds = zbounds / axis2.Count;
+
+        setupXAxis(axis1, axis2);
+        setupZAxis(axis1, axis2);
+
+
+        //Plot bars on the chart
+        for (int i = 1; i < axis1.Count; i++)
+        {
+            //Get random colour for each country
+            Color cubecol = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
+
+            //Plot values for each country according to year
+            for (int j = 0; j < axis2.Count; j++)
+            {
+                //Get x and z positions to plot on graph
+                Vector3 cubeloc = new Vector3(xpositions[i - 1].x, 0, zpositions[j].z);
+                string key = axis1[i - 1] + ',' + axis2[j];
+                Debug.Log(key);
+                foreach (KeyValuePair<string, string> item in dict)
+                {
+                    if (key == item.Key)
+                    {
+                        //Create bar
+                        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        cube.transform.SetParent(graphPos.transform);
+                        cube.GetComponent<Renderer>().material.SetColor("_Color", cubecol);
+                        cube.tag = "field";
+
+                        Debug.Log(item.Value + "here");
+                        //Get value of field
+                        int value = System.Convert.ToInt32(item.Value);
+
+                        cube.name = axis1[i - 1] + ',' + axis2[j] + ',' + value;
+
+                        //Scale bar based on value
+                        cube.transform.position = cubeloc;
+                        cube.transform.localScale += new Vector3(0.1f, value / unitConverter, 4); //Divide value by 1338 to get value in Unity units
+                        cube.transform.position += new Vector3(0, cube.transform.localScale.y / 2, 0);
+                    }
+                }
+
+            }
+        }
+
+        //graphPos.transform.child
+        //Set axes in correct locations + rotations
+        setupAxisOrientation();
     }
 
 }
