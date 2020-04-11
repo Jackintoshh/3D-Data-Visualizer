@@ -33,24 +33,25 @@ public class MoveAround : MonoBehaviour
         graph = graphob.GetComponent<Graph>();
     }
 
-  
-  
 
-    void Walk(float units)
+
+    void StrafeAround(float speed)
     {
-        transform.position += mainCamera.transform.forward * units;
+        transform.position += mainCamera.transform.right * speed;
+
     }
 
-    void Fly(float units)
+    void WalkAround(float speed)
     {
-        transform.position += Vector3.up * units;
+        transform.position += mainCamera.transform.forward * speed;
     }
 
-    void Strafe(float units)
+    void FlyAround(float speed)
     {
-        transform.position += mainCamera.transform.right * units;
-
+        transform.position += Vector3.up * speed;
     }
+
+    
 
     // Update is called once per frame
     void Update()
@@ -74,11 +75,11 @@ public class MoveAround : MonoBehaviour
 
         if (Input.GetKey(KeyCode.E))
         {
-            Fly(Time.deltaTime * speed);
+            FlyAround(Time.deltaTime * speed);
         }
         if (Input.GetKey(KeyCode.F))
         {
-            Fly(-Time.deltaTime * speed);
+            FlyAround(-Time.deltaTime * speed);
         }
         
         if (Input.GetKeyDown("h"))
@@ -119,8 +120,8 @@ public class MoveAround : MonoBehaviour
 
             float contWalk = Input.GetAxis("Vertical");
             float contStrafe = Input.GetAxis("Horizontal");
-            Walk(contWalk * speed * Time.deltaTime);
-            Strafe(contStrafe * speed * Time.deltaTime);
+            WalkAround(contWalk * speed * Time.deltaTime);
+            StrafeAround(contStrafe * speed * Time.deltaTime);
        }
     }
 
