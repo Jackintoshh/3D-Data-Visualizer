@@ -328,7 +328,7 @@ public class Graph : MonoBehaviour
         zpositions.Clear();
         textSize = 2f;
 
-        spacing = 5f;
+        spacing = 3.8f;
         setupAxes(axis1, axis2);
         setupYAxis(axis1, axis2);
 

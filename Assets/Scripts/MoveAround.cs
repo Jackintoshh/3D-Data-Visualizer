@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using System.Text;
 using TMPro;
 
-public class FPSController : MonoBehaviour
+public class MoveAround : MonoBehaviour
 {
     public Camera mainCamera;
     public float speed = 50.0f;
-    //public Camera camera = Camera.main;
     public bool allowPitch = false;
     public static RaycastHit hit;
     Ray ray;
@@ -26,47 +25,16 @@ public class FPSController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        //if (mainCamera == null)
-        //{
-            mainCamera = Camera.main;
-        //}
-
-        //RaycastHit hit;
+       
+        mainCamera = Camera.main;
         mask = LayerMask.GetMask("spin");
-        //canvas = new GameObject();
         dfi = canvas.AddComponent<DrawFieldInfo>();
         camMode = true;
         graph = graphob.GetComponent<Graph>();
     }
 
-    
-
-    void Yaw(float angle)
-    {
-        Quaternion rot = Quaternion.AngleAxis(angle, Vector3.up);
-        transform.rotation = rot * transform.rotation;
-    }
-
-    void Roll(float angle)
-    {
-        Quaternion rot = Quaternion.AngleAxis(angle, Vector3.forward);
-        transform.rotation = rot * transform.rotation;
-    }
-
-    void Pitch(float angle)
-    {
-        float invcosTheta1 = Vector3.Dot(transform.forward, Vector3.up);
-        float threshold = 0.95f;
-        if ((angle > 0 && invcosTheta1 < (-threshold)) || (angle < 0 && invcosTheta1 > (threshold)))
-        {
-            return;
-        }
-
-        // A pitch is a rotation around the right vector
-        Quaternion rot = Quaternion.AngleAxis(angle, transform.right);
-
-        transform.rotation = rot * transform.rotation;
-    }
+  
+  
 
     void Walk(float units)
     {
@@ -103,15 +71,6 @@ public class FPSController : MonoBehaviour
             dfi.drawInfo(hit);
         }
 
-        if (Input.GetKey(KeyCode.Escape))
-        {
-            Application.Quit();
-        }
-
-        if (Input.GetKey(KeyCode.LeftShift) || runAxis != 0)
-        {
-            speed *= 5.0f;
-        }
 
         if (Input.GetKey(KeyCode.E))
         {
